@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demo.springboot.security.model.dao.UserMapper">
+    <resultMap id="RoleMap" type="com.demo.springboot.security.model.entity.Role">
+        <id property="id" column="role_id"/>
+        <result property="name" column="role_name"/>
+        <result property="desc" column="role_desc"/>
+        <collection property="sources" ofType="com.demo.springboot.security.model.entity.Source">
+            <id property="id" column="source_id"/>
+            <result property="name" column="source_name"/>
+            <result property="desc" column="source_desc"/>
+            <result property="url" column="source_url"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="BaseMap" type="com.demo.springboot.security.model.entity.User">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="enable" column="enable"/>
+        <collection property="roles" resultMap="RoleMap"/>
+    </resultMap>
+
+    <select id="selectByUserName" resultMap="BaseMap">
+    SELECT
+    DISTINCT
+    u.*,
+    r.id role_id,
+    r.`desc` role_desc,
+    r.`name` role_name,
+    s.id source_id,
+    s.`name` source_name,
+    s.`desc` source_desc,
+    s.url source_url
+    FROM `user` u
+    JOIN user_role ur ON u.id=ur.user_id
+    JOIN role r ON r.id=ur.role_id
+    JOIN role_source rs ON r.id= rs.role_id
+    JOIN source s ON rs.source_id =s.id
+    WHERE
+    u.name=#{userName}
+    </select>
+
+</mapper>
